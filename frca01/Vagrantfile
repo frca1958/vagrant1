@@ -1,0 +1,30 @@
+
+# Running this from Helios user fc.
+
+
+ENV['DO_SSHPORT'] ||= '22'
+
+
+Vagrant.configure('2') do |config|
+
+  config.ssh.port 	= ENV['DO_SSHPORT']
+  config.vm.hostname 	= 'frca0'
+
+#  config.vm.synced_folder "../data", "/vagrant_data"
+  config.vm.provision "shell", path: "startup.sh"
+
+  config.vm.provider :digital_ocean do |provider, override|
+    override.vm.box 	= 'digital_ocean'
+    override.vm.box_url = "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+    provider.ssh_key_name 		= 'Vagrant_Helios'
+    override.ssh.private_key_path 	= '~/.ssh/id_rsa'
+
+    provider.token  = ENV['DO_TOKEN']
+#    provider.ipv6   = false
+    provider.image  = 'docker'
+    provider.region = 'ams3'
+    provider.size   = '512mb'
+    provider.user_data = File.read('user-data.yml')
+  end
+
+end

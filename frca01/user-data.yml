@@ -1,0 +1,7 @@
+#cloud-config
+runcmd:
+  - sed -i.bak -e '/iface eth0 inet6/,/dns-nameserver/d' -e '/gateway/ a \\tdns-nameservers 8.8.8.8 8.8.4.4' /etc/network/interfaces
+  - ifdown eth0 && ifup eth0
+  - sed -i '/^Port 22/a Port 443' /etc/ssh/sshd_config
+  - service ssh restart
+  - timedatectl set-timezone Europe/Brussels
