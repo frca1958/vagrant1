@@ -1,0 +1,29 @@
+#cloud-config
+
+
+coreos:
+  etcd:
+    discovery: token will be placed here by config.rb
+    addr: $private_ipv4:4001
+    peer-addr: $private_ipv4:7001
+    
+  fleet:
+    # used for fleetctl ssh command
+    public-ip: $private_ipv4
+
+  units:
+    - name: etcd.service
+      command: start
+    - name: fleet.service
+      command: start
+      
+
+
+
+
+#runcmd:
+#  - sed -i.bak -e '/iface eth0 inet6/,/dns-nameserver/d' -e '/gateway/ a \\tdns-nameservers 8.8.8.8 8.8.4.4' /etc/network/interfaces
+#  - ifdown eth0 && ifup eth0
+#  - sed -i '/^Port 22/a Port 443' /etc/ssh/sshd_config
+#  - service ssh restart
+#  - timedatectl set-timezone Europe/Brussels

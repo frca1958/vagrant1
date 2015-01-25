@@ -1,0 +1,42 @@
+# -*- mode: ruby -*-
+# # vi: set ft=ruby :
+
+Vagrant.require_version ">= 1.6.0"
+
+require_relative 'config'
+
+
+ENV['DO_SSHPORT'] ||= '22'
+ENV['DO_KEYNAME'] ||= 'VAGRANT'
+
+
+
+$instances = 1
+
+
+Vagrant.configure('2') do |config|
+  config.ssh.port 	= ENV['DO_SSHPORT']
+  config.ssh.username 	= 'core'
+#  config.vm.hostname 	= 'frca02'
+  config.vm.provision "shell", path: "startup.sh"
+
+
+  (1..$instances).each do |i|
+    config.vm.define "core-%02d"%i do |config|
+      config.vm.provider :digital_ocean do |provider, override|
+        override.vm.box			= 'digital_ocean'
+        override.vm.box_url		= "https://github.com/smdahlen/vagrant-digitalocean/raw/master/box/digital_ocean.box"
+        override.ssh.private_key_path	= '~/.ssh/id_rsa'
+
+        provider.ssh_key_name		= ENV['DO_KEYNAME']
+        provider.token			= ENV['DO_TOKEN']
+        provider.image			= 'coreos-stable'
+        provider.region 		= 'ams3'
+        provider.size			= '512MB'
+        provider.setup			= false
+        provider.private_networking	= true
+        provider.user_data		= File.read('user-data.tmp')
+      end
+    end
+  end
+end

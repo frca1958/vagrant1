@@ -1,3 +1,5 @@
 .vagrant/
-.private/
-.env
+.local/
+.tmp/
+*.env
+*.tmp
